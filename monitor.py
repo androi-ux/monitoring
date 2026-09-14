@@ -74,6 +74,11 @@ REQUEST_HEADERS = {
     "Accept-Language": "en-US,en;q=0.9",
 }
 REQUEST_TIMEOUT = 20
+# Button texts on a product tile that mean "this can be ordered right now".
+# ispace.ge has used "Add to cart" everywhere, and switched Open Box tiles to
+# "Check condition" (2026-09). Keep both so a future markup change in either
+# direction doesn't silently zero out a whole category again.
+IN_STOCK_PHRASES = ("add to cart", "check condition")
 
 # Telegram hard limit is 4096 chars per text message; stay comfortably under it.
 TELEGRAM_TEXT_LIMIT = 3500
@@ -210,7 +215,7 @@ def parse_products(html: str, page_url: str, label: str) -> dict:
         if not name:
             continue
 
-        available = "add to cart" in text.lower()
+        available = any(phrase in text.lower() for phrase in IN_STOCK_PHRASES)
         not_available = "notify me" in text.lower()
         is_in_stock = available and not not_available
         if not is_in_stock:
@@ -325,6 +330,16 @@ def main() -> int:
     new_snapshot = dict(old_snapshot)
     any_page_ok = False
     all_new_products = {}
+  # URLs whose page we actually re-scraped successfully this run. Only
+  # these are allowed to report "item disappeared" — a page that failed
+  # to fetch or parse (0 products: dead selector, temporary block, a
+  # redesigned tile like Open Box's "Check condition" switch) must never
+  # make its previously-known items look like they vanished. Without
+  # this guard, a broken page gets stuck: its old items are never
+  # refreshed in the snapshot, so every future run keeps re-diffing them
+  # against nothing and re-sending "No longer available" for the same
+  # still-in-stock items forever.
+  succeeded_urls = set()
 
     for url in WATCH_URLS:
         label = label_for_url(url)
@@ -340,6 +355,7 @@ def main() -> int:
             continue
 
         any_page_ok = True
+              succeeded_urls.add(url)
         all_new_products.update(page_products)
 
         for u, i in old_snapshot.items():
@@ -355,7 +371,8 @@ def main() -> int:
         log.info("First run — sending full listing (%d products) and saving baseline.", len(all_new_products))
         send_full_listing(all_new_products)
     else:
-        sent = diff_and_notify(old_snapshot, all_new_products)
+        old_for_diff = {u: i for u, i in old_snapshot.items() if i.get("source") in succeeded_urls}
+        sent = diff_and_notify(old_for_diff, all_new_products)
         if sent:
             log.info("Sent %d change notification(s).", sent)
         else:
