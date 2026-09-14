@@ -330,16 +330,16 @@ def main() -> int:
     new_snapshot = dict(old_snapshot)
     any_page_ok = False
     all_new_products = {}
-  # URLs whose page we actually re-scraped successfully this run. Only
-  # these are allowed to report "item disappeared" — a page that failed
-  # to fetch or parse (0 products: dead selector, temporary block, a
-  # redesigned tile like Open Box's "Check condition" switch) must never
-  # make its previously-known items look like they vanished. Without
-  # this guard, a broken page gets stuck: its old items are never
-  # refreshed in the snapshot, so every future run keeps re-diffing them
-  # against nothing and re-sending "No longer available" for the same
-  # still-in-stock items forever.
-  succeeded_urls = set()
+    # URLs whose page we actually re-scraped successfully this run. Only
+    # these are allowed to report "item disappeared" — a page that failed
+    # to fetch or parse (0 products: dead selector, temporary block, a
+    # redesigned tile like Open Box's "Check condition" switch) must never
+    # make its previously-known items look like they vanished. Without
+    # this guard, a broken page gets stuck: its old items are never
+    # refreshed in the snapshot, so every future run keeps re-diffing them
+    # against nothing and re-sending "No longer available" for the same
+    # still-in-stock items forever.
+    succeeded_urls = set()
 
     for url in WATCH_URLS:
         label = label_for_url(url)
@@ -355,7 +355,7 @@ def main() -> int:
             continue
 
         any_page_ok = True
-              succeeded_urls.add(url)
+        succeeded_urls.add(url)
         all_new_products.update(page_products)
 
         for u, i in old_snapshot.items():
