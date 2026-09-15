@@ -198,5 +198,13 @@
     "image": "https://prod-cdn.prod.asbis.io/s3size/el:t/f:webp/rt:fill/w:512/plain/s3://cms/product/86/86/868664f9d715eae4ad81a93428026da3/260303190022769545.webp",
     "source": "https://ispace.ge/en/category/ipad",
     "label": "Ipad"
+  },
+  "https://ispace.ge/en/product/ipad-air-13-m4-256-gb-wi-fi-2026-starlight-mh5w4qa-a": {
+    "name": "iPad Air 13 M4, 256 GB Wi-Fi 2026, Starlight",
+    "url": "https://ispace.ge/en/product/ipad-air-13-m4-256-gb-wi-fi-2026-starlight-mh5w4qa-a",
+    "price": "3 919 ₾",
+    "image": "https://prod-cdn.prod.asbis.io/s3size/el:t/f:webp/rt:fill/w:512/plain/s3://cms/product/2a/90/2a9067a6d4194abdcb43f27278c8374e/260303190022254243.webp",
+    "source": "https://ispace.ge/en/category/ipad",
+    "label": "Ipad"
   }
 }
